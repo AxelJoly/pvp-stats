@@ -34,3 +34,15 @@ module.exports.playerStats =  function playerStats(player){
       // Send the embed to the same channel as the message
       return embed;
 }
+
+module.exports.matchAddedFailed = function errorMessage(error){
+  const embed = new MessageEmbed()
+      // Set the title of the field
+      .setTitle(error.name)
+      // Set the color of the embed
+      .setColor(0xd20000)
+      // Set the main content of the embed
+      .setDescription(error.message);
+    // Send the embed to the same channel as the message
+    return embed;
+}

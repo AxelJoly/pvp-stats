@@ -36,62 +36,69 @@ discordClient.on('message', function(message) {
 
   // Verify ! as first character
   if(message.content.indexOf(process.env.PREFIX) !== 0) {
-    console.log("Not a command");
     return;
   }
 
   const args = message.content.slice(process.env.PREFIX_LENGTH).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
-  console.log('invocked command: ' + command);
+  console.log('Invocked command: ' + command);
   
   if (command === 'match') {
-    const status = args.shift().toLowerCase();
-    const alliance = args.shift().toLowerCase();
-    const playerNames = args;
-    mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true});
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', async function() {
-      var players = await PlayerSchema.find().where('name').in(playerNames);
-      playerNames.forEach(async playerName => {
-        if(!players.some(item => item.name === playerName)){
-          const player = new PlayerSchema({ name: playerName, guild: 'Atom', win: '0', loose:'0'});
-          players.push(player);
-          await player.save();    
-        }
-      });
-      console.log(players);
-      const match = new MatchSchema({ status: status, alliance: alliance, players:players});
-      await match.save();
+    try{
+      const status = args.shift().toLowerCase();
+      const alliance = args.shift().toLowerCase();
+      const playerNames = args;
+      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+      var db = mongoose.connection;
+      db.on('error', console.error.bind(console, 'connection error:'));
+      db.once('open', async function() {
+        var players = await PlayerSchema.find().where('name').in(playerNames);
+        playerNames.forEach(async playerName => {
+          if(!players.some(item => item.name === playerName)){
+            const player = new PlayerSchema({ name: playerName, guild: 'Atom', win: 0, loose: 0 });
+            players.push(player);
+            await player.save();    
+          }
+        });
+        const match = new MatchSchema({ status: status, alliance: alliance, players:players });
+        await match.save();
 
-      var matchValue;
-      if(status.match('win')){
-        matchValue = 'win';
-      } else if(status.match('loose')){
-        matchValue = 'loose';
-      }else {
-        message.channel.send('Failed');
-        return
-      }
-      console.log(matchValue);
-      const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [matchValue]: 1 }});
-      console.log('Matched: ' + res.n);
-      console.log('Updated: ' + res.nModified)
-      message.channel.send(messageFormatter.matchAdded(status, alliance, players));
-    });  
+        var matchValue;
+        if(status.match('win')){
+          matchValue = 'win';
+        } else if(status.match('loose')){
+          matchValue = 'loose';
+        }else {
+          message.channel.send('Failed');
+          return
+        }
+        console.log(matchValue);
+        const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [matchValue]: 1 }});
+        console.log('Matched: ' + res.n);
+        console.log('Updated: ' + res.nModified)
+        message.channel.send(messageFormatter.matchAdded(status, alliance, players));
+      });  
+    } catch(err) {
+      message.channel.send(messageFormatter.errorMessage(err));
+    }
   }
   if(command === 'stats') {
-    const playerName = args.shift();
-    console.log(playerName);
-    mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true});
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', async function() {
-      var player = await PlayerSchema.where({name: playerName}).findOne();
-      if(player){
-        message.channel.send(messageFormatter.playerStats(player));
-      }
-    });
+    try {
+      const playerName = args.shift();
+      console.log(playerName);
+      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true});
+      var db = mongoose.connection;
+      db.on('error', console.error.bind(console, 'connection error:'));
+      db.once('open', async function() {
+        var player = await PlayerSchema.where({name: playerName}).findOne();
+        if(player){
+          message.channel.send(messageFormatter.playerStats(player));
+        }
+      });
+    }
+    catch(err) {
+      message.channel.send(messageFormatter.errorMessage(err));
+    }
   }
 });
 
