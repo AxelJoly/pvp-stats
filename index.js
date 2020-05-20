@@ -3,6 +3,9 @@
 const { Client } = require('discord.js');
 require('dotenv').config();
 
+const PREFIX = '!'
+const PREFIX_LENGTH = 1
+
 // MongoDB Models
 var MatchSchema = require('./classes/match');
 var PlayerSchema = require('./classes/player');
@@ -14,7 +17,7 @@ var messageFormatter = require('./utils/messageFormatter');
 const discordClient = new Client();
 
 var mongoose = require('mongoose');
-var url = `mongodb+srv://poppy:${process.env.MONGODB_PASSWORD}@cluster0-hebsv.mongodb.net/pvp-stats?retryWrites=true&w=majority`;
+var url = `mongodb+srv://poppy:${process.env.MONGODB_PASSWORD}@cluster0-hebsv.mongodb.net/pvp-stats-${process.env.ENV}?retryWrites=true&w=majority`;
 
 /**
  * The ready event is vital, it means that only _after_ this will your bot start reacting to information
@@ -35,11 +38,11 @@ discordClient.on('message', function(message) {
   if(message.author.bot) return;
 
   // Verify ! as first character
-  if(message.content.indexOf(process.env.PREFIX) !== 0) {
+  if(message.content.indexOf(PREFIX) !== 0) {
     return;
   }
 
-  const args = message.content.slice(process.env.PREFIX_LENGTH).trim().split(/ +/g);
+  const args = message.content.slice(PREFIX_LENGTH).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
   console.log('Invocked command: ' + command);
   
