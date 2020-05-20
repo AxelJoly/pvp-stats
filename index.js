@@ -1,5 +1,6 @@
 'use strict';
 
+var http = require('http');
 const { Client } = require('discord.js');
 require('dotenv').config();
 
@@ -108,4 +109,4 @@ discordClient.on('message', function(message) {
 // Log our bot in using the token from https://discordapp.com/developers/applications/me
 discordClient.login(process.env.DISCORD_TOKEN);
 
-
+http.createServer(function (request, response) {}).listen(process.env.PORT || 5000);
