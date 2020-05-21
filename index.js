@@ -1,6 +1,9 @@
 'use strict';
 
-var http = require('http');
+
+const express = require('express')
+const app = express()
+
 const { Client } = require('discord.js');
 require('dotenv').config();
 
@@ -109,7 +112,10 @@ discordClient.on('message', function(message) {
 // Log our bot in using the token from https://discordapp.com/developers/applications/me
 discordClient.login(process.env.DISCORD_TOKEN);
 
-http.createServer(function (request, response) {
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.end(`PvP Stats bot ${process.env.ENV}`);
-}).listen(process.env.PORT || 8080);
+app.get('/', function (req, res) {
+  res.send(`PvP Stats Bot ${process.env.ENV}`)
+})
+
+app.listen(process.env.PORT || 3000, function () {
+  console.log('Example app listening on port 3000!')
+})
