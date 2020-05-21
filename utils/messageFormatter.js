@@ -23,19 +23,22 @@ function beautifulTeam(players){
 }
   
 module.exports.playerStats =  function playerStats(player){
-    var total = Math.round(100*player.win/(player.win+player.loose), 1) + '%'
     const embed = new MessageEmbed()
-        // Set the title of the field
-        .setTitle(`**${player.name}**`)
-        // Set the color of the embed
-        .setColor(0x359d08)
-        // Set the main content of the embed
-        .setDescription(`**Wins:** ${player.win}\n **Looses:** ${player.loose}\n**Winrate:** ${total}`);
-      // Send the embed to the same channel as the message
+  
+    if(player){
+      var total = Math.round(100*player.win/(player.win+player.loose), 1) + '%'
+      embed.setTitle(`**${player.name}**`)
+            .setColor(0x359d08)
+            .setDescription(`**Wins:** ${player.win}\n **Looses:** ${player.loose}\n**Winrate:** ${total}`);
+    } else {
+      embed.setTitle('**Player not found**')
+      .setColor(0xd20000)
+      .setDescription('Impossible to retrieve data.');
+    } 
       return embed;
 }
 
-module.exports.matchAddedFailed = function errorMessage(error){
+module.exports.errorMessage = function errorMessage(error){
   const embed = new MessageEmbed()
       // Set the title of the field
       .setTitle(error.name)

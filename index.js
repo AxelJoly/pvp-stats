@@ -21,7 +21,7 @@ var messageFormatter = require('./utils/messageFormatter');
 const discordClient = new Client();
 
 var mongoose = require('mongoose');
-var url = `mongodb+srv://poppy:${process.env.MONGODB_PASSWORD}@cluster0-hebsv.mongodb.net/pvp-stats-${process.env.ENV}?retryWrites=true&w=majority`;
+var url = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0-hebsv.mongodb.net/pvp-stats-${process.env.ENV}?retryWrites=true&w=majority`;
 
 /**
  * The ready event is vital, it means that only _after_ this will your bot start reacting to information
@@ -57,7 +57,10 @@ discordClient.on('message', function(message) {
       const playerNames = args;
       mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
       var db = mongoose.connection;
-      db.on('error', console.error.bind(console, 'connection error:'));
+      db.on('error', function(){
+        message.channel.send(messageFormatter.errorMessage({name: "**Database not reachable**", message: "Please try again later."}));
+        return;
+      });
       db.once('open', async function() {
         var players = await PlayerSchema.find().where('name').in(playerNames);
         playerNames.forEach(async playerName => {
@@ -77,7 +80,7 @@ discordClient.on('message', function(message) {
           matchValue = 'loose';
         }else {
           message.channel.send('Failed');
-          return
+          return;
         }
         console.log(matchValue);
         const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [matchValue]: 1 }});
@@ -86,6 +89,7 @@ discordClient.on('message', function(message) {
         message.channel.send(messageFormatter.matchAdded(status, alliance, players));
       });  
     } catch(err) {
+      console.log(err.message);
       message.channel.send(messageFormatter.errorMessage(err));
     }
   }
@@ -95,15 +99,17 @@ discordClient.on('message', function(message) {
       console.log(playerName);
       mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true});
       var db = mongoose.connection;
-      db.on('error', console.error.bind(console, 'connection error:'));
+      db.on('error', function(){ 
+        message.channel.send(messageFormatter.errorMessage({name: "**Database not reachable**", message: "Please try again later."})); 
+        return;
+      });
       db.once('open', async function() {
         var player = await PlayerSchema.where({name: playerName}).findOne();
-        if(player){
-          message.channel.send(messageFormatter.playerStats(player));
-        }
+        message.channel.send(messageFormatter.playerStats(player));    
       });
     }
     catch(err) {
+      console.log(err.message);
       message.channel.send(messageFormatter.errorMessage(err));
     }
   }
