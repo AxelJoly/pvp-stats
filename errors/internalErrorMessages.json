@@ -9,6 +9,10 @@
             "name": "Erreur",
             "down": "Database indisponible.",
             "update": "Mise à jour des données indisponible."
+        },
+        "GitError": {
+            "name": "Erreur",
+            "startup": "Impossible de récupérer les données."
         }
     }
 }

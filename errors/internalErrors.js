@@ -19,7 +19,10 @@ class DatabaseError extends IntenalError {}
 
 class BadInputParameters extends IntenalError {}
 
+class GitError extends IntenalError {}
+
 module.exports = {
     DatabaseError,
-    BadInputParameters
+    BadInputParameters,
+    GitError
 }

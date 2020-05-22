@@ -49,3 +49,15 @@ module.exports.errorMessage = function errorMessage(error){
     // Send the embed to the same channel as the message
     return embed;
 }
+
+module.exports.startupMessage = function startupMessage(version, body, commitedOn){
+  const embed = new MessageEmbed()
+      // Set the title of the field
+      .setTitle(`Pvp Stats Bot v${version}`)
+      // Set the color of the embed
+      .setColor(0x0072f2)
+      // Set the main content of the embed
+      .setDescription(`**Latest version deployed on:** ${commitedOn}\n **Features:** ${body}`);
+    // Send the embed to the same channel as the message
+    return embed;
+}
