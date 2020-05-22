@@ -2,14 +2,14 @@
 
 const { MessageEmbed } = require('discord.js');
 
-module.exports.matchAdded = function matchAdded(status, alliance, players){
+module.exports.matchAdded = function matchAdded(scenario, status, alliance, players){
   const embed = new MessageEmbed()
       // Set the title of the field
-      .setTitle('Match successfully added!')
+      .setTitle('Match ajouté!')
       // Set the color of the embed
       .setColor(0x359d08)
       // Set the main content of the embed
-      .setDescription(`**Opponent:** ${alliance.toUpperCase()}\n **Status:** ${status.toUpperCase()}\n **Team Members:**\n${beautifulTeam(players)}`);
+      .setDescription(`**Alliance:** ${alliance.toUpperCase()}\n **Status:** ${scenario.toUpperCase()} ${status.toUpperCase()}\n **Equipe:**\n${beautifulTeam(players)}`);
     // Send the embed to the same channel as the message
     return embed;
 }
@@ -29,11 +29,11 @@ module.exports.playerStats =  function playerStats(player){
       var total = Math.round(100*player.win/(player.win+player.loose), 1) + '%'
       embed.setTitle(`**${player.name}**`)
             .setColor(0x359d08)
-            .setDescription(`**Wins:** ${player.win}\n **Looses:** ${player.loose}\n**Winrate:** ${total}`);
+            .setDescription(`**Victoires:** ${player.win}\n **Défaites:** ${player.loose}\n**Ratio:** ${total}`);
     } else {
-      embed.setTitle('**Player not found**')
+      embed.setTitle('**Player inconnu**')
       .setColor(0xd20000)
-      .setDescription('Impossible to retrieve data.');
+      .setDescription('Impossible de récupérer les données.');
     } 
       return embed;
 }

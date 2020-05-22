@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var PlayerSchema = new Schema({
-    name: String,
+    name: { type: String , unique: true },
     guild: String,
     win: Number,
     loose: Number

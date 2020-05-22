@@ -1,0 +1,14 @@
+{
+    "errorMessages": {
+        "BadInputParameters": {
+            "name": "Mauvaise données d'entrée",
+            "scenario": "Valeur acceptée: DEF ou ATK.",
+            "status": "Valeur acceptée: WIN ou LOOSE."
+        },
+        "DatabaseError": {
+            "name": "Erreur",
+            "down": "Database indisponible.",
+            "update": "Mise à jour des données indisponible."
+        }
+    }
+}

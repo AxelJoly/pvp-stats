@@ -4,10 +4,12 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MatchSchema = new Schema({
+    date: Date,
+    scenario: String,
     status: String,
     alliance: String,
     players:[
-      {type: Schema.Types.ObjectId, ref: 'Player'}
+      { type: Schema.Types.ObjectId, ref: 'Player' }
     ]
 });
 

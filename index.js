@@ -1,6 +1,5 @@
 'use strict';
 
-
 const express = require('express')
 const app = express()
 
@@ -16,6 +15,9 @@ var PlayerSchema = require('./classes/player');
 
 // Message Formatter
 var messageFormatter = require('./utils/messageFormatter');
+
+// Error Classes
+var internalErrors = require('./errors/internalErrors');
 
 // Create an instance of a Discord client
 const discordClient = new Client();
@@ -52,41 +54,46 @@ discordClient.on('message', function(message) {
   
   if (command === 'match') {
     try{
+      const scenario = args.shift().toLowerCase();
+      if(scenario != 'def' && scenario != 'atk') {
+          throw new internalErrors.BadInputParameters('scenario')
+      }
+      
       const status = args.shift().toLowerCase();
+      if(status != 'win' && status != 'loose') {
+        throw new internalErrors.BadInputParameters('status')
+      }
+
       const alliance = args.shift().toLowerCase();
       const playerNames = args;
       mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
       var db = mongoose.connection;
       db.on('error', function(){
-        message.channel.send(messageFormatter.errorMessage({name: "**Database not reachable**", message: "Please try again later."}));
-        return;
+        throw new internalErrors.DatabaseError('down');
       });
       db.once('open', async function() {
         var players = await PlayerSchema.find().where('name').in(playerNames);
         playerNames.forEach(async playerName => {
-          if(!players.some(item => item.name === playerName)){
-            const player = new PlayerSchema({ name: playerName, guild: 'Atom', win: 0, loose: 0 });
+          if (!players.some(item => item.name === playerName)){
+            const player = await new PlayerSchema({ name: playerName, guild: 'Atom', win: 0, loose: 0 }).save();
+            if(!player) {
+              throw new internalErrors.DatabaseError('update');
+            }
             players.push(player);
-            await player.save();    
           }
         });
-        const match = new MatchSchema({ status: status, alliance: alliance, players:players });
-        await match.save();
-
-        var matchValue;
-        if(status.match('win')){
-          matchValue = 'win';
-        } else if(status.match('loose')){
-          matchValue = 'loose';
-        }else {
-          message.channel.send('Failed');
-          return;
+        const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players:players }).save();
+        if(!match) {
+          throw new internalErrors.DatabaseError('update');
         }
-        console.log(matchValue);
-        const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [matchValue]: 1 }});
+        const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [status]: 1 } },function(err, res) {
+          if(err) {
+            throw new errorMessage.DatabaseError('update');
+          }
+        });
         console.log('Matched: ' + res.n);
         console.log('Updated: ' + res.nModified)
-        message.channel.send(messageFormatter.matchAdded(status, alliance, players));
+        message.channel.send(messageFormatter.matchAdded(scenario, status, alliance, players));
       });  
     } catch(err) {
       console.log(err.message);
@@ -97,14 +104,18 @@ discordClient.on('message', function(message) {
     try {
       const playerName = args.shift();
       console.log(playerName);
-      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true});
+      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
       var db = mongoose.connection;
-      db.on('error', function(){ 
-        message.channel.send(messageFormatter.errorMessage({name: "**Database not reachable**", message: "Please try again later."})); 
-        return;
+      db.on('error', function() { 
+        throw new errorMessage.DatabaseError('down');
       });
       db.once('open', async function() {
-        var player = await PlayerSchema.where({name: playerName}).findOne();
+        var player = await PlayerSchema.where({name: playerName}).findOne(
+          function(err, res) {
+            if(err) {
+              throw new errorMessage.DatabaseError('update');
+            }
+          });
         message.channel.send(messageFormatter.playerStats(player));    
       });
     }
@@ -125,3 +136,7 @@ app.get('/', function (req, res) {
 app.listen(process.env.PORT || 3000, function () {
   console.log('Example app listening on port 3000!')
 })
+
+String.prototype.capitalize = function (string){
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
