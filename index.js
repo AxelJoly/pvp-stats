@@ -17,8 +17,6 @@ var PlayerSchema = require('./classes/player');
 var messageFormatter = require('./utils/messageFormatter');
 var timeUtils = require('./utils/timeUtils');
 
-var git = require('git-last-commit');
-
 // Error Classes
 var internalErrors = require('./errors/internalErrors');
 
@@ -35,17 +33,7 @@ var url = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSW
 discordClient.on('ready', () => {
   console.log('I am ready!');
   const channel = discordClient.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-  try {
-    git.getLastCommit(function(err, commit) {
-      if(err) {
-        throw new internalErrors.GitError('startup')
-      }     
-      channel.send(messageFormatter.startupMessage(process.env.npm_package_version, commit.subject, timeUtils.formatDate(new Date(commit.committedOn*1000))));
-    });
-  } catch(err) {
-    console.log(err.message);
-    channel.send(messageFormatter.errorMessage(err));
-  } 
+  channel.send(messageFormatter.startupMessage(process.env.npm_package_version));
 });
 
 // Create an event listener for messages
