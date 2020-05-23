@@ -1,8 +1,9 @@
 'use strict';
 
 const { MessageEmbed } = require('discord.js');
+const features = require('./features.json').features;
 
-module.exports.matchAdded = function matchAdded(scenario, status, alliance, players){
+module.exports.matchAdded = function matchAdded(scenario, status, alliance, players) {
   const embed = new MessageEmbed()
       // Set the title of the field
       .setTitle('Match ajouté!')
@@ -13,16 +14,8 @@ module.exports.matchAdded = function matchAdded(scenario, status, alliance, play
     // Send the embed to the same channel as the message
     return embed;
 }
-
-function beautifulTeam(players){
-    var team = ''
-    players.forEach(player => {
-      team = team + '*' + player.name + '*\n'
-    });
-    return team;
-}
   
-module.exports.playerStats =  function playerStats(player, wins, looses, score){
+module.exports.playerStats =  function playerStats(player, wins, looses, score) {
     const embed = new MessageEmbed()
   
     if(player){
@@ -38,7 +31,7 @@ module.exports.playerStats =  function playerStats(player, wins, looses, score){
       return embed;
 }
 
-module.exports.errorMessage = function errorMessage(error){
+module.exports.errorMessage = function errorMessage(error) {
   const embed = new MessageEmbed()
       // Set the title of the field
       .setTitle(error.name)
@@ -50,7 +43,7 @@ module.exports.errorMessage = function errorMessage(error){
     return embed;
 }
 
-module.exports.startupMessage = function startupMessage(version){
+module.exports.startupMessage = function startupMessage(version) {
   const embed = new MessageEmbed()
       // Set the title of the field
       .setTitle(`Pvp Stats Bot Update! 🍻`)
@@ -61,3 +54,36 @@ module.exports.startupMessage = function startupMessage(version){
     // Send the embed to the same channel as the message
     return embed;
 }
+
+module.exports.helpMessage = function helpMessage(feature) {
+  const embed = new MessageEmbed()
+      // Set the title of the field
+      .setTitle(`Helping Tools`)
+      // Set the color of the embed
+      .setColor(0x0072f2)
+      // Set the main content of the embed
+      .setDescription(featureHelper(feature));
+    // Send the embed to the same channel as the message
+    return embed;
+}
+
+function beautifulTeam(players) {
+  var team = ''
+  players.forEach(player => {
+    team = team + '*' + player.name + '*\n'
+  });
+  return team;
+}
+
+function featureHelper(featureName){
+  if(featureName) {
+    const feature = features.find(feature => feature.name === featureName)
+    return `**!${feature.name}**\n${feature.usage}\n${feature.command}`
+  }
+  var message = '';
+  features.forEach(feature => {
+    message = message + `**!${feature.name}**\n${feature.usage}\n${feature.command}\n\n`
+  })
+  return message;
+}
+

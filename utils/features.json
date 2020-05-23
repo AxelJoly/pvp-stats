@@ -1,0 +1,14 @@
+{
+    "features": [
+        {
+            "name":"match",
+            "usage":"Ajoute un match (fonctionne de 1 à 5 joueurs)",
+            "command":"!match [DEF|ATK] [WIN|LOOSE] ALLIANCE JOUEUR1 JOUEUR2 ... JOUEUR5"
+        },
+        {
+            "name":"stats",
+            "usage":"Affiche les statistiques d'un joueur",
+            "command":"!stats JOUEUR"
+        }
+    ]
+}

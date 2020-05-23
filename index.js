@@ -152,6 +152,15 @@ discordClient.on('message', function(message) {
       message.channel.send(messageFormatter.errorMessage(err));
     }
   }
+  if (command === 'help') {
+    const feature = args.shift();
+    if(feature){
+      message.channel.send(messageFormatter.helpMessage(feature));
+    }else {
+      message.channel.send(messageFormatter.helpMessage());
+    }
+     
+  }
 });
 
 // Log our bot in using the token from https://discordapp.com/developers/applications/me
