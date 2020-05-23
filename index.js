@@ -89,7 +89,6 @@ discordClient.on('message', function(message) {
             players.push(player);
           }
         };
-        console.log(players);
         const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players: players }).save();
         if(!match) {
           throw new internalErrors.DatabaseError('update');
@@ -124,20 +123,17 @@ discordClient.on('message', function(message) {
               throw new errorMessage.DatabaseError('update');
             }
           });
-          console.log(player);
           var matchs = await MatchSchema.where({"players": player._id}).find(
             function(err, res) {
               if(err) {
                 throw new errorMessage.DatabaseError('update');
               }
             });
-          console.log(matchs);
           var wins = 0;
           var looses = 0;
           var score = 0;
 
           matchs.forEach(match => {
-            console.log(match.status);
             if(match.status == 'win') {
               wins++;
               score++;
