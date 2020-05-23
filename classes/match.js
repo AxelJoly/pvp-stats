@@ -8,7 +8,7 @@ var MatchSchema = new Schema({
     scenario: String,
     status: String,
     alliance: String,
-    players:[
+    players: [
       { type: Schema.Types.ObjectId, ref: 'Player' }
     ]
 });

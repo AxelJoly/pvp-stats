@@ -5,9 +5,7 @@ var Schema = mongoose.Schema;
 
 var PlayerSchema = new Schema({
     name: { type: String , unique: true },
-    guild: String,
-    win: Number,
-    loose: Number
+    guild: String
 });
 
 module.exports = mongoose.model('Player', PlayerSchema);

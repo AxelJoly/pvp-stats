@@ -22,14 +22,14 @@ function beautifulTeam(players){
     return team;
 }
   
-module.exports.playerStats =  function playerStats(player){
+module.exports.playerStats =  function playerStats(player, wins, looses, score){
     const embed = new MessageEmbed()
   
     if(player){
-      var total = Math.round(100*player.win/(player.win+player.loose), 1) + '%'
+      var total = Math.round(100*wins/(wins+looses), 1) + '%'
       embed.setTitle(`**${player.name}**`)
             .setColor(0x359d08)
-            .setDescription(`**Victoires:** ${player.win}\n **Défaites:** ${player.loose}\n**Ratio:** ${total}`);
+            .setDescription(`**Score:** ${score} point(s)\n**Victoires:** ${wins}\n**Défaites:** ${looses}\n**Ratio:** ${total}`);
     } else {
       embed.setTitle('**Player inconnu**')
       .setColor(0xd20000)

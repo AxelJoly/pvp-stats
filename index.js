@@ -69,14 +69,18 @@ discordClient.on('message', function(message) {
 
       const alliance = args.shift().toLowerCase();
       const playerNames = args;
+      if(playerNames.length < 1 || playerNames.length > 5) {
+        throw new internalErrors.BadInputParameters('length')
+      }
       mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
       var db = mongoose.connection;
       db.on('error', function(){
         throw new internalErrors.DatabaseError('down');
       });
+
       db.once('open', async function() {
         var players = await PlayerSchema.find().where('name').in(playerNames);
-        playerNames.forEach(async playerName => {
+        for (const playerName of playerNames) {
           if (!players.some(item => item.name === playerName)){
             const player = await new PlayerSchema({ name: playerName, guild: 'Atom', win: 0, loose: 0 }).save();
             if(!player) {
@@ -84,8 +88,9 @@ discordClient.on('message', function(message) {
             }
             players.push(player);
           }
-        });
-        const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players:players }).save();
+        };
+        console.log(players);
+        const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players: players }).save();
         if(!match) {
           throw new internalErrors.DatabaseError('update');
         }
@@ -119,7 +124,31 @@ discordClient.on('message', function(message) {
               throw new errorMessage.DatabaseError('update');
             }
           });
-        message.channel.send(messageFormatter.playerStats(player));    
+          console.log(player);
+          var matchs = await MatchSchema.where({"players": player._id}).find(
+            function(err, res) {
+              if(err) {
+                throw new errorMessage.DatabaseError('update');
+              }
+            });
+          console.log(matchs);
+          var wins = 0;
+          var looses = 0;
+          var score = 0;
+
+          matchs.forEach(match => {
+            console.log(match.status);
+            if(match.status == 'win') {
+              wins++;
+              score++;
+              if(match.scenario == 'def') {
+                score++;
+              }
+            }else {
+              looses++;
+            }
+          })
+        message.channel.send(messageFormatter.playerStats(player, wins, looses, score));    
       });
     }
     catch(err) {

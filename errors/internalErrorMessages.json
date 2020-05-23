@@ -3,7 +3,8 @@
         "BadInputParameters": {
             "name": "Mauvaise données d'entrée",
             "scenario": "Valeur acceptée: DEF ou ATK.",
-            "status": "Valeur acceptée: WIN ou LOOSE."
+            "status": "Valeur acceptée: WIN ou LOOSE.",
+            "length": "1-5 joueurs maximum."
         },
         "DatabaseError": {
             "name": "Erreur",
