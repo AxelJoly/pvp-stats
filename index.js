@@ -123,12 +123,15 @@ discordClient.on('message', function(message) {
               throw new errorMessage.DatabaseError('update');
             }
           });
-          var matchs = await MatchSchema.where({"players": player._id}).find(
-            function(err, res) {
-              if(err) {
-                throw new errorMessage.DatabaseError('update');
-              }
-            });
+          
+          if(player){
+            var matchs = await MatchSchema.where({"players": player._id}).find(
+              function(err, res) {
+                if(err) {
+                  throw new errorMessage.DatabaseError('update');
+                }
+              });
+          
           var wins = 0;
           var looses = 0;
           var score = 0;
@@ -144,7 +147,9 @@ discordClient.on('message', function(message) {
               looses++;
             }
           })
-        message.channel.send(messageFormatter.playerStats(player, wins, looses, score));    
+            message.channel.send(messageFormatter.playerStats(player, wins, looses, score));
+        }
+        message.channel.send(messageFormatter.playerStats(player, wins, looses, score)); 
       });
     }
     catch(err) {
