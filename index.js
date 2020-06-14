@@ -82,7 +82,7 @@ discordClient.on('message', function(message) {
         var players = await PlayerSchema.find().where('name').in(playerNames);
         for (const playerName of playerNames) {
           if (!players.some(item => item.name === playerName)){
-            const player = await new PlayerSchema({ name: playerName, guild: 'Atom', win: 0, loose: 0 }).save();
+            const player = await new PlayerSchema({ name: playerName, guild: process.env.GUILD, win: 0, loose: 0 }).save();
             if(!player) {
               throw new internalErrors.DatabaseError('update');
             }
@@ -148,8 +148,9 @@ discordClient.on('message', function(message) {
             }
           })
             message.channel.send(messageFormatter.playerStats(player, wins, looses, score));
+        } else {
+          throw new errorMessage.DataNotFound('player');
         }
-        message.channel.send(messageFormatter.playerStats(player, wins, looses, score)); 
       });
     }
     catch(err) {

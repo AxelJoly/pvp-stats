@@ -21,8 +21,11 @@ class BadInputParameters extends IntenalError {}
 
 class GitError extends IntenalError {}
 
+class DataNotFound extends IntenalError {}
+
 module.exports = {
     DatabaseError,
     BadInputParameters,
-    GitError
+    GitError,
+    DataNotFound
 }

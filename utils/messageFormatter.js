@@ -17,18 +17,11 @@ module.exports.matchAdded = function matchAdded(scenario, status, alliance, play
   
 module.exports.playerStats =  function playerStats(player, wins, looses, score) {
     const embed = new MessageEmbed()
-  
-    if(player){
-      var total = Math.round(100*wins/(wins+looses), 1) + '%'
-      embed.setTitle(`**${player.name}**`)
-            .setColor(0x359d08)
-            .setDescription(`**Score:** ${score} point(s)\n**Victoires:** ${wins}\n**Défaites:** ${looses}\n**Ratio:** ${total}`);
-    } else {
-      embed.setTitle('**Player inconnu**')
-      .setColor(0xd20000)
-      .setDescription('Impossible de récupérer les données.');
-    } 
-      return embed;
+    var total = Math.round(100*wins/(wins+looses), 1) + '%'
+    embed.setTitle(`**${player.name}**`)
+          .setColor(0x359d08)
+          .setDescription(`**Score:** ${score} point(s)\n**Victoires:** ${wins}\n**Défaites:** ${looses}\n**Ratio:** ${total}`);
+    return embed;
 }
 
 module.exports.errorMessage = function errorMessage(error) {

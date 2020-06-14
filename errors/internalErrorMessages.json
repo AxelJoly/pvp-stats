@@ -14,6 +14,10 @@
         "GitError": {
             "name": "Erreur",
             "startup": "Impossible de récupérer les données."
+        },
+        "DataNotFound": {
+            "name": "Impossible de récupérer les données.",
+            "player": "Joueur inconnu"
         }
     }
 }
