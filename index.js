@@ -9,27 +9,17 @@ require('dotenv').config();
 const PREFIX = '!'
 const PREFIX_LENGTH = 1
 
-// MongoDB Models
-var MatchSchema = require('./classes/match');
-var PlayerSchema = require('./classes/player');
-
 // Utils
 var messageFormatter = require('./utils/messageFormatter');
-var timeUtils = require('./utils/timeUtils');
-
-// Error Classes
-var internalErrors = require('./errors/internalErrors');
 
 // Create an instance of a Discord client
 const discordClient = new Client();
-
-var mongoose = require('mongoose');
-var url = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0-hebsv.mongodb.net/pvp-stats-${process.env.ENV}?retryWrites=true&w=majority`;
 
 /**
  * The ready event is vital, it means that only _after_ this will your bot start reacting to information
  * received from Discord
  */
+
 discordClient.on('ready', () => {
   console.log('I am ready!');
   const channel = discordClient.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
@@ -37,7 +27,7 @@ discordClient.on('ready', () => {
 });
 
 // Create an event listener for messages
-discordClient.on('message', function(message) {
+discordClient.on('message', async function(message) {
   /**
    *  FORMAT: (WIN|LOOSE) (ALI) [JOUEUR1, ..., JOUEUR5]
    *  EXAMPLE: WIN UNEX Haltahiz Shintai
@@ -56,116 +46,13 @@ discordClient.on('message', function(message) {
   console.log('Invocked command: ' + command);
   
   if (command === 'match') {
-    try{
-      const scenario = args.shift().toLowerCase();
-      if(scenario != 'def' && scenario != 'atk') {
-          throw new internalErrors.BadInputParameters('scenario')
-      }
-      
-      const status = args.shift().toLowerCase();
-      if(status != 'win' && status != 'loose') {
-        throw new internalErrors.BadInputParameters('status')
-      }
-
-      const alliance = args.shift().toLowerCase();
-      const playerNames = args;
-      if(playerNames.length < 1 || playerNames.length > 5) {
-        throw new internalErrors.BadInputParameters('length')
-      }
-      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-      var db = mongoose.connection;
-      db.on('error', function(){
-        throw new internalErrors.DatabaseError('down');
-      });
-
-      db.once('open', async function() {
-        var players = await PlayerSchema.find().where('name').in(playerNames);
-        for (const playerName of playerNames) {
-          if (!players.some(item => item.name === playerName)){
-            const player = await new PlayerSchema({ name: playerName, guild: process.env.GUILD, win: 0, loose: 0 }).save();
-            if(!player) {
-              throw new internalErrors.DatabaseError('update');
-            }
-            players.push(player);
-          }
-        };
-        const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players: players }).save();
-        if(!match) {
-          throw new internalErrors.DatabaseError('update');
-        }
-        const res = await PlayerSchema.updateMany({ name: playerNames }, { $inc: { [status]: 1 } },function(err, res) {
-          if(err) {
-            throw new errorMessage.DatabaseError('update');
-          }
-        });
-        console.log('Matched: ' + res.n);
-        console.log('Updated: ' + res.nModified)
-        message.channel.send(messageFormatter.matchAdded(scenario, status, alliance, players));
-      });  
-    } catch(err) {
-      console.log(err.message);
-      message.channel.send(messageFormatter.errorMessage(err));
-    }
+    await require('./features/match').addMatch(message, args);
   }
   if(command === 'stats') {
-    try {
-      const playerName = args.shift();
-      console.log(playerName);
-      mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-      var db = mongoose.connection;
-      db.on('error', function() { 
-        throw new errorMessage.DatabaseError('down');
-      });
-      db.once('open', async function() {
-        var player = await PlayerSchema.where({name: playerName}).findOne(
-          function(err, res) {
-            if(err) {
-              throw new errorMessage.DatabaseError('update');
-            }
-          });
-          
-          if(player){
-            var matchs = await MatchSchema.where({"players": player._id}).find(
-              function(err, res) {
-                if(err) {
-                  throw new errorMessage.DatabaseError('update');
-                }
-              });
-          
-          var wins = 0;
-          var looses = 0;
-          var score = 0;
-
-          matchs.forEach(match => {
-            if(match.status == 'win') {
-              wins++;
-              score++;
-              if(match.scenario == 'def') {
-                score++;
-              }
-            }else {
-              looses++;
-            }
-          })
-            message.channel.send(messageFormatter.playerStats(player, wins, looses, score));
-        } else {
-          throw new errorMessage.DataNotFound('player');
-        }
-      });
-    }
-    catch(err) {
-      console.log(err.message);
-      message.channel.send(messageFormatter.errorMessage(err));
-    }
+    await require('./features/stats').getPlayerStats(message, args);
   }
   if (command === 'help') {
-    const feature = args.shift();
-    if(feature){
-      message.channel.send(messageFormatter.helpMessage(feature));
-    }else {
-      message.channel.send(messageFormatter.helpMessage());
-    }
-     
+    await require('./features/help').getHelp(message, args);
   }
 });
 
@@ -179,8 +66,6 @@ app.get('/', function (req, res) {
 app.listen(process.env.PORT || 3000, function () {
   console.log('Example app listening on port 3000!')
 })
-
-
 
 String.prototype.capitalize = function (string){
   return string.charAt(0).toUpperCase() + string.slice(1)
