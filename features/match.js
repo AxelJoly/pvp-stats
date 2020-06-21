@@ -2,11 +2,13 @@
 
 const { url } = require('../utils/mongodb');
 var mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 var internalErrors = require('../errors/internalErrors');
 var messageFormatter = require('../utils/messageFormatter');
 
 var MatchSchema = require('../classes/match');
 var PlayerSchema = require('../classes/player');
+var AllianceSchema = require('../classes/alliance');
 
 module.exports.addMatch = async function addMatch(message, args){
     try{
@@ -36,6 +38,7 @@ module.exports.addMatch = async function addMatch(message, args){
         });
   
         db.once('open', async function() {
+          // Verify if players already exists or need to create them.
           var players = await PlayerSchema.find().where('name').in(playerNames);
           for (const playerName of playerNames) {
             if (!players.some(item => item.name === playerName)){
@@ -46,7 +49,12 @@ module.exports.addMatch = async function addMatch(message, args){
               players.push(player);
             }
           };
-          const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: alliance, players: players }).save();
+          var allianceFound = await AllianceSchema.find({ name: alliance});
+          console.log(allianceFound.length);
+          if(allianceFound.length == 0) {
+            allianceFound[0] = await new AllianceSchema({ name: alliance, value: 1 }).save();
+          }
+          const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: allianceFound[0], players: players }).save();
           if(!match) {
             throw new internalErrors.DatabaseError('update');
           }

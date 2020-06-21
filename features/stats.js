@@ -2,6 +2,7 @@
 
 const { url } = require('../utils/mongodb');
 var mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 var internalErrors = require('../errors/internalErrors');
 var messageFormatter = require('../utils/messageFormatter');
 

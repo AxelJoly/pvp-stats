@@ -5,7 +5,8 @@
             "scenario": "Valeur acceptée: DEF ou ATK.",
             "status": "Valeur acceptée: WIN ou LOOSE.",
             "length": "1-5 joueurs maximum.",
-            "alliance": "Renseignez un tag d'alliance"
+            "alliance": "Renseignez un tag d'alliance",
+            "value": "Renseignez une valeur pour l'alliance"
         },
         "DatabaseError": {
             "name": "Erreur",

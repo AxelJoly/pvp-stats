@@ -51,6 +51,9 @@ discordClient.on('message', async function(message) {
   if(command === 'stats') {
     await require('./features/stats').getPlayerStats(message, args);
   }
+  if(command === 'alliance') {
+    await require('./features/alliance').editAllianceScore(message, args);
+  }
   if (command === 'help') {
     await require('./features/help').getHelp(message, args);
   }
