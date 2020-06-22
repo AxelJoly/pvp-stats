@@ -48,14 +48,18 @@ module.exports.startupMessage = function startupMessage(version) {
     return embed;
 }
 
-module.exports.updateAllianceScore = function updateAllianceScore(name, score) {
+module.exports.updateAllianceScore = function updateAllianceScore(name, atkWin, atkLoose, defWin, defLoose) {
+  var body = '  ATK WIN: ' + atkWin +  
+               '\n  ATK LOOSE: ' + atkLoose + 
+               '\n  DEF WIN: ' + defWin + 
+               '\n  DEF LOOSE: ' + defLoose;
   const embed = new MessageEmbed()
       // Set the title of the field
       .setTitle(`Score enregistré!`)
       // Set the color of the embed
       .setColor(0x0072f2)
       // Set the main content of the embed
-      .setDescription(`**Alliance:** ${name}\n **Score:** ${score}`);
+      .setDescription(`**Alliance:** ${name}\n **Score:**\n${body}`);
     // Send the embed to the same channel as the message
     return embed;
 }

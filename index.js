@@ -69,7 +69,3 @@ app.get('/', function (req, res) {
 app.listen(process.env.PORT || 3000, function () {
   console.log('Example app listening on port 3000!')
 })
-
-String.prototype.capitalize = function (string){
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}

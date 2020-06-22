@@ -8,6 +8,7 @@ var messageFormatter = require('../utils/messageFormatter');
 
 var MatchSchema = require('../classes/match');
 var PlayerSchema = require('../classes/player');
+var AllianceSchema = require('../classes/alliance');
 
 module.exports.getPlayerStats = async function getPlayerStats(message, args){
 try {
@@ -27,12 +28,7 @@ try {
         });
         
         if(player){
-            var matchs = await MatchSchema.where({"players": player._id}).find(
-            function(err, res) {
-                if(err) {
-                throw new internalErrors.DatabaseError('update');
-                }
-            });
+            var matchs = await MatchSchema.where({"players": player._id}).find().populate("alliance").exec();
         
         var wins = 0;
         var looses = 0;
@@ -40,13 +36,19 @@ try {
 
         matchs.forEach(match => {
             if(match.status == 'win') {
-            wins++;
-            score++;
-            if(match.scenario == 'def') {
-                score++;
-            }
-            }else {
-            looses++;
+                wins++;
+                if(match.scenario == 'def') {
+                    score = score + match.alliance.valueDefWin;
+                } else {
+                    score = score + match.alliance.valueAtkWin;
+                }
+            } else {
+                looses++;
+                if(match.scenario == 'def') {
+                    score = score + match.alliance.valueDefLoose;
+                } else {
+                    score = score + match.alliance.valueAtkLoose;
+                }
             }
         })
             message.channel.send(messageFormatter.playerStats(player, wins, looses, score));

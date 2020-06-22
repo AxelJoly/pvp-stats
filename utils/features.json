@@ -9,6 +9,11 @@
             "name":"stats",
             "usage":"Affiche les statistiques d'un joueur",
             "command":"!stats JOUEUR"
+        },
+        {
+            "name":"alliance",
+            "usage":"Modifie les gains de points d'une alliance. *Ex. !alliance UNEX 0.5 0 1 0.5*",
+            "command":"!alliance ALLIANCE ATKWIN ATKLOOSE DEFWIN DEFLOOSE"
         }
     ]
 }

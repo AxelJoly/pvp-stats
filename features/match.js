@@ -49,10 +49,10 @@ module.exports.addMatch = async function addMatch(message, args){
               players.push(player);
             }
           };
-          var allianceFound = await AllianceSchema.find({ name: alliance});
+          var allianceFound = await AllianceSchema.find({ name: alliance });
           console.log(allianceFound.length);
           if(allianceFound.length == 0) {
-            allianceFound[0] = await new AllianceSchema({ name: alliance, value: 1 }).save();
+            allianceFound[0] = await new AllianceSchema({ name: alliance, valueAtkWin: 0.5, valueAtkLoose: 0, valueDefWin: 1, valueDefLoose: 0.5 }).save();
           }
           const match = await new MatchSchema({ date: new Date(), scenario: scenario, status: status, alliance: allianceFound[0], players: players }).save();
           if(!match) {

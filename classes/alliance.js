@@ -5,7 +5,10 @@ var Schema = mongoose.Schema;
 
 var AllianceSchema = new Schema({
     name: { type: String , unique: true },
-    value: Number
+    valueAtkWin: Number,
+    valueDefWin: Number,
+    valueAtkLoose: Number,
+    valueDefLoose: Number
 });
 
 module.exports = mongoose.model('Alliance', AllianceSchema);
